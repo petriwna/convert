@@ -1,0 +1,91 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-top: 0;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 545px;
+  object-fit: cover;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  display: inline-block;
+}
+
+address {
+  font-style: normal;
+}
+
+table {
+  width: 100%;
+  text-align: center;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type='number'],
+input[type="number"]:hover,
+input[type="number"]:focus {
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
