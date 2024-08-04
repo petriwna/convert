@@ -33,7 +33,7 @@ module.exports = {
       },
     ],
     'no-useless-catch': 'off',
-    'no-console': 'error',
+    // 'no-console': 'error',
     'no-unused-vars': 'error',
     'no-undef': 'error',
     strict: ['error', 'global'],
