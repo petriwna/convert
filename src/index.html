@@ -7,6 +7,7 @@
   <meta http-equiv='X-UA-Compatible' content='ie=edge'>
   <title>Convert</title>
   <script src='https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js'></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class='base-container'>
@@ -34,9 +35,8 @@
 
   <div class='base-container__container container'>
     <div class='container__input'>
-      <input type='file' id='json_file'
-             accept='.json' />
-      <label for='excel_file'>
+      <input type="file" id='json_file' accept=".json" />
+      <label for='json_file'>
         Select JSON File
       </label>
     </div>

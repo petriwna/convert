@@ -1,4 +1,4 @@
-export class ExcelUploader {
+export class ExcelToJsonConvert {
   constructor(fileInputId, convertButtonId, outputId, downloadButtonId) {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
