@@ -62,32 +62,105 @@ export class JsonToExcelConvert {
 
   jsonToExcelFormat(jsonData) {
     const excelData = [];
+    const names = [];
+    const actors = [];
+    const lands = new Set();
+    const secondRow = [null, 'label', null, null];
+    let label = null;
+    const firstRow = [null, null, null, null];
+    const formats = new Set();
+
     for (const name in jsonData) {
-      const label = jsonData[name].label;
+      names.push(name);
 
+      label = jsonData[name].label;
       for (const actor in jsonData[name]) {
-        console.log(actor);
-        if (actor !== label) {
-          for (const land in jsonData[name][actor]) {
-            console.log(land);
-            for (const format in jsonData[name][actor][land]) {
-              console.log(format);
-              const row = {
-                Name: name,
-                Label: label,
-                Actor: actor,
-                Land: land,
-                Format: format,
-                Text: jsonData[name][actor][land][format],
-              };
+        actors.push(actor);
+        for (const land in jsonData[name][actor]) {
+          if (actor !== 'label') {
+            lands.add(land);
 
-              excelData.push(row);
+            for (const format in jsonData[name][actor][land]) {
+              formats.add(format);
+              console.log(jsonData[name][actor][land][format]);
             }
           }
         }
       }
     }
-    console.log(excelData);
+
+    lands.forEach((land) => {
+      secondRow.push(land);
+
+      switch (land) {
+        case 'ua':
+          firstRow.push('Оригінал');
+          break;
+        case 'en':
+          firstRow.push('Англійська en');
+          break;
+        case 'pl':
+          firstRow.push('Польська pl');
+          break;
+        case 'lt':
+          firstRow.push('Литовська lt');
+          break;
+        case 'cz':
+          firstRow.push('Чеська cz');
+          break;
+        case 'de':
+          firstRow.push('Німецька de');
+          break;
+        case 'ro':
+          firstRow.push('Румунська ro');
+          break;
+        case 'sk':
+          firstRow.push('Словацька sk');
+          break;
+        case 'lv':
+          firstRow.push('Латиська lv');
+          break;
+        case 'et':
+          firstRow.push('Естонська et');
+          break;
+        case 'hu':
+          firstRow.push('Угорська hu');
+          break;
+        case 'it':
+          firstRow.push('Італійська it');
+          break;
+        case 'fr':
+          firstRow.push('Французська fr');
+          break;
+        case 'es':
+          firstRow.push('Іспанська es');
+          break;
+        case 'ca':
+          firstRow.push('Каталонська са');
+          break;
+      }
+    });
+
+    excelData.push(firstRow);
+    excelData.push(secondRow);
+
+    names.forEach((name) => {
+      actors.forEach((actor) => {
+        if (actor !== 'label') {
+          formats.forEach((format) => {
+            const row = [name, label, actor, format];
+
+            lands.forEach((land) => {
+              const text = jsonData[name][actor][land][format] || '';
+              row.push(text);
+            });
+
+            excelData.push(row);
+          });
+        }
+      });
+    });
+
     return excelData;
   }
 }
