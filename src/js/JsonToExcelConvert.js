@@ -118,8 +118,19 @@ export class JsonToExcelConvert {
   }
 
   jsonToExcelFormat(jsonData) {
+    const sortedKeys = Object.keys(jsonData).sort((a, b) => {
+      const numA = parseInt(a.split('_')[0], 10);
+      const numB = parseInt(b.split('_')[0], 10);
+      if (numA !== numB) {
+        return numA - numB;
+      }
+      const suffixA = a.split('_').slice(1).join('_');
+      const suffixB = b.split('_').slice(1).join('_');
+      return suffixA.localeCompare(suffixB);
+    });
+
     const excelData = [];
-    const names = new Set();
+    const names = [];
     const actors = new Set();
     const lands = new Set();
     const secondRow = [null, 'label', null, null];
@@ -127,8 +138,8 @@ export class JsonToExcelConvert {
     const firstRow = [null, null, null, null];
     const formats = new Set();
 
-    for (const name in jsonData) {
-      names.add(name);
+    sortedKeys.forEach((name) => {
+      names.push(name);
 
       for (const actor in jsonData[name]) {
         if (actor !== 'label') {
@@ -143,7 +154,7 @@ export class JsonToExcelConvert {
           }
         }
       }
-    }
+    });
 
     lands.forEach((land) => {
       secondRow.push(land);
@@ -219,6 +230,7 @@ export class JsonToExcelConvert {
       });
     });
 
+    console.log(names)
     return excelData;
   }
 }
