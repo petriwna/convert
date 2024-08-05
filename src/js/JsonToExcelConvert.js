@@ -1,12 +1,12 @@
 import * as XLSX from 'xlsx-js-style';
 
 export class JsonToExcelConvert {
-  constructor(fileInputId, convertButtonId, downloadButtonId, outputId) {
+  constructor(fileInputId, convertButtonId) {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
     this.convertButton = document.getElementById(convertButtonId);
-    this.outputElement = document.getElementById(outputId);
-    this.downloadButton = document.getElementById(downloadButtonId);
+    // this.outputElement = document.getElementById(outputId);
+    // this.downloadButton = document.getElementById(downloadButtonId);
 
     this.init();
   }
@@ -14,7 +14,7 @@ export class JsonToExcelConvert {
   init() {
     this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
     this.convertButton.addEventListener('click', () => this.handleConvertFile());
-    this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
+    // this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
   }
 
   handleFileSelect(event) {
@@ -31,22 +31,27 @@ export class JsonToExcelConvert {
       const fileReader = new FileReader();
       fileReader.onload = (event) => {
         const jsonData = JSON.parse(event.target.result);
-        this.displayJson(jsonData);
+        const formattedData = this.jsonToExcelFormat(jsonData);
+        const ws = XLSX.utils.aoa_to_sheet(formattedData);
+
+        this.applyStyles(ws);
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+        const filename = 'json_to_excel.xlsx';
+        XLSX.writeFile(wb, filename);
       };
       fileReader.readAsText(this.selectedFile);
     } catch (error) {
       console.error('Error reading JSON file:', error);
     }
   }
-
-  displayJson(jsonData) {
-    this.outputElement.value = JSON.stringify(jsonData, null, 2);
-  }
-
-  handleDownloadFile() {
-    const jsonData = JSON.parse(this.outputElement.value);
-    this.downloadObjectAsExcel(jsonData, 'json_to_excel');
-  }
+  //
+  // handleDownloadFile() {
+  //   const jsonData = JSON.parse(this.outputElement.value);
+  //   this.downloadObjectAsExcel(jsonData, 'json_to_excel');
+  // }
 
   downloadObjectAsExcel(jsonData, filename) {
     try {

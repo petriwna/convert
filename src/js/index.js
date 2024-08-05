@@ -4,7 +4,7 @@ import { JsonToExcelConvert } from './JsonToExcelConvert';
 
 export function init() {
   new ExcelToJsonConvert('excel_file', 'convert_btn', 'json_data', 'download_btn');
-  new JsonToExcelConvert('json_file', 'convert-json-btn', 'download-json-btn', 'excel-data');
+  new JsonToExcelConvert('json_file', 'convert-json-btn');
 }
 
 document.addEventListener('DOMContentLoaded', init);
