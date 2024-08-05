@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx-js-style';
+
 export class JsonToExcelConvert {
   constructor(fileInputId, convertButtonId, downloadButtonId, outputId) {
     this.selectedFile = null;
@@ -51,12 +53,69 @@ export class JsonToExcelConvert {
       if (formattedData.length === 0) {
         throw new Error('Formatted data is empty. Please check the JSON structure.');
       }
-      const ws = XLSX.utils.json_to_sheet(formattedData);
+      const ws = XLSX.utils.aoa_to_sheet(formattedData);
+
+      this.applyStyles(ws);
+
       const wb = XLSX.utils.book_new();
+
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
       XLSX.writeFile(wb, `${filename}.xlsx`);
     } catch (error) {
       console.error('Error during Excel file creation:', error);
+    }
+  }
+
+  applyStyles(ws) {
+    const range = XLSX.utils.decode_range(ws['!ref']);
+
+    for (let row = range.s.r; row <= range.e.r; row++) {
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+        const cell = ws[cellAddress];
+
+        if (cell) {
+          cell.s = {
+            font: {
+              name: 'Arial',
+              sz: 10,
+            },
+            alignment: { wrapText: true },
+            border: {
+              top: { style: 'thin' },
+              bottom: { style: 'thin' },
+              left: { style: 'thin' },
+              right: { style: 'thin' },
+            },
+          };
+
+          if (row === 1) {
+            cell.s.font = {
+              name: 'Arial',
+              sz: 10,
+              bold: true,
+            };
+            cell.s.fill = { fgColor: { rgb: 'c5d9f1' } };
+            cell.s.alignment = { horizontal: 'center' };
+          }
+
+          if (col >= 0 && col <= 3) {
+            cell.s.fill = { fgColor: { rgb: 'c5d9f1' } };
+            cell.s.font = {
+              name: 'Arial',
+              sz: 10,
+              bold: true,
+            };
+          }
+
+          if (col >= 4 && row >= 2) {
+            cell.s.font = {
+              name: 'Arial',
+              sz: 8,
+            };
+          }
+        }
+      }
     }
   }
 
@@ -74,15 +133,16 @@ export class JsonToExcelConvert {
       names.push(name);
 
       label = jsonData[name].label;
+
       for (const actor in jsonData[name]) {
-        actors.push(actor);
-        for (const land in jsonData[name][actor]) {
-          if (actor !== 'label') {
+        if (actor !== 'label') {
+          actors.push(actor);
+
+          for (const land in jsonData[name][actor]) {
             lands.add(land);
 
             for (const format in jsonData[name][actor][land]) {
               formats.add(format);
-              console.log(jsonData[name][actor][land][format]);
             }
           }
         }
