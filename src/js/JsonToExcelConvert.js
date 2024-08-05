@@ -5,8 +5,6 @@ export class JsonToExcelConvert {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
     this.convertButton = document.getElementById(convertButtonId);
-    // this.outputElement = document.getElementById(outputId);
-    // this.downloadButton = document.getElementById(downloadButtonId);
 
     this.init();
   }
@@ -14,7 +12,6 @@ export class JsonToExcelConvert {
   init() {
     this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
     this.convertButton.addEventListener('click', () => this.handleConvertFile());
-    // this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
   }
 
   handleFileSelect(event) {
@@ -47,30 +44,25 @@ export class JsonToExcelConvert {
       console.error('Error reading JSON file:', error);
     }
   }
+
+  // downloadObjectAsExcel(jsonData, filename) {
+  //   try {
+  //     const formattedData = this.jsonToExcelFormat(jsonData);
+  //     if (formattedData.length === 0) {
+  //       throw new Error('Formatted data is empty. Please check the JSON structure.');
+  //     }
+  //     const ws = XLSX.utils.aoa_to_sheet(formattedData);
   //
-  // handleDownloadFile() {
-  //   const jsonData = JSON.parse(this.outputElement.value);
-  //   this.downloadObjectAsExcel(jsonData, 'json_to_excel');
+  //     this.applyStyles(ws);
+  //
+  //     const wb = XLSX.utils.book_new();
+  //
+  //     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  //     XLSX.writeFile(wb, `${filename}.xlsx`);
+  //   } catch (error) {
+  //     console.error('Error during Excel file creation:', error);
+  //   }
   // }
-
-  downloadObjectAsExcel(jsonData, filename) {
-    try {
-      const formattedData = this.jsonToExcelFormat(jsonData);
-      if (formattedData.length === 0) {
-        throw new Error('Formatted data is empty. Please check the JSON structure.');
-      }
-      const ws = XLSX.utils.aoa_to_sheet(formattedData);
-
-      this.applyStyles(ws);
-
-      const wb = XLSX.utils.book_new();
-
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-      XLSX.writeFile(wb, `${filename}.xlsx`);
-    } catch (error) {
-      console.error('Error during Excel file creation:', error);
-    }
-  }
 
   applyStyles(ws) {
     const range = XLSX.utils.decode_range(ws['!ref']);
