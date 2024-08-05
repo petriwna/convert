@@ -26,6 +26,7 @@ export class JsonToExcelConvert {
   }
 
   handleConvertFile() {
+    console.log('convert');
     try {
       const fileReader = new FileReader();
       fileReader.onload = (event) => {
@@ -121,8 +122,8 @@ export class JsonToExcelConvert {
 
   jsonToExcelFormat(jsonData) {
     const excelData = [];
-    const names = [];
-    const actors = [];
+    const names = new Set();
+    const actors = new Set();
     const lands = new Set();
     const secondRow = [null, 'label', null, null];
     let label = null;
@@ -130,13 +131,11 @@ export class JsonToExcelConvert {
     const formats = new Set();
 
     for (const name in jsonData) {
-      names.push(name);
-
-      label = jsonData[name].label;
+      names.add(name);
 
       for (const actor in jsonData[name]) {
         if (actor !== 'label') {
-          actors.push(actor);
+          actors.add(actor);
 
           for (const land in jsonData[name][actor]) {
             lands.add(land);
@@ -208,6 +207,8 @@ export class JsonToExcelConvert {
       actors.forEach((actor) => {
         if (actor !== 'label') {
           formats.forEach((format) => {
+            label = jsonData[name].label;
+
             const row = [name, label, actor, format];
 
             lands.forEach((land) => {
