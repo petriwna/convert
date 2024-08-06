@@ -1,9 +1,10 @@
 export class ExcelToJsonConvert {
-  constructor(fileInputId, outputId, downloadButtonId) {
+  constructor(fileInputId, outputId, downloadButtonId, dragId, dropTextId) {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
-    // this.convertButton = document.getElementById(convertButtonId);
     this.outputElement = document.getElementById(outputId);
+    this.dragElement = document.getElementById(dragId);
+    this.dropText = document.getElementById(dropTextId);
     this.downloadButton = document.getElementById(downloadButtonId);
 
     this.init();
@@ -11,8 +12,36 @@ export class ExcelToJsonConvert {
 
   init() {
     this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
-    // this.convertButton.addEventListener('click', () => this.handleConvertFile());
+    this.dragElement.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      this.dragElement.classList.add('active');
+      this.dropText.textContent = 'Release to Upload';
+    });
+
+    this.dragElement.addEventListener('dragleave', () => {
+      this.dragElement.classList.remove('active');
+      this.dropText.textContent = 'Drag & Drop';
+    });
+
+    this.dragElement.addEventListener('drop', (event) => {
+      event.preventDefault();
+      this.selectedFile = event.dataTransfer.files[0];
+      this.handleFileSelect({ target: { files: [this.selectedFile] } });
+    });
     this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
+  }
+
+  displayFile() {
+    const fileType = this.selectedFile.type;
+    const validMimeType = 'application/json';
+    const validExtension = '.xls';
+
+    if (fileType === validMimeType && this.selectedFile.name.endsWith(validExtension)) {
+      this.handleConvertFile();
+    } else {
+      alert('This is not a JSON file.');
+      this.dragElement.classList.remove('active');
+    }
   }
 
   async handleFileSelect(event) {
@@ -105,6 +134,10 @@ export class ExcelToJsonConvert {
   handleDownloadFile() {
     const jsonData = this.outputElement.value;
     this.downloadObjectAsJson(jsonData, 'excel_to_json');
+    this.dragElement.classList.remove('active');
+    this.dropText.textContent = 'Drag & Drop';
+    this.outputElement.value = '';
+    this.selectedFile = null;
   }
 
   downloadObjectAsJson(jsonData, filename) {
