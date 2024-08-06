@@ -11,7 +11,9 @@ export class ExcelToJsonConvert {
   }
 
   init() {
-    this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
+    this.fileInput.addEventListener('change', (event) =>
+      this.handleFileSelect(event.target.files[0]),
+    );
     this.dragElement.addEventListener('dragover', (event) => {
       event.preventDefault();
       this.dragElement.classList.add('active');
@@ -25,8 +27,8 @@ export class ExcelToJsonConvert {
 
     this.dragElement.addEventListener('drop', (event) => {
       event.preventDefault();
-      this.selectedFile = event.dataTransfer.files[0];
-      this.handleFileSelect({ target: { files: [this.selectedFile] } });
+      // this.selectedFile = event.dataTransfer.files[0];
+      this.handleFileSelect(event.dataTransfer.files[0]);
     });
     this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
   }
@@ -44,9 +46,9 @@ export class ExcelToJsonConvert {
     }
   }
 
-  async handleFileSelect(event) {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
+  async handleFileSelect(file) {
+    if (file) {
+      this.selectedFile = file;
       await this.handleConvertFile();
     } else {
       console.error('No file selected');
@@ -68,7 +70,7 @@ export class ExcelToJsonConvert {
     const temp = {};
     const actors = new Set();
     const lengths = new Set();
-    const lands = data[1].filter((value) => value !== null && value !== 'label');
+    const lands = data[0].filter((value) => value !== null && value !== 'label');
 
     data.forEach((row) => {
       const name = row[0];
@@ -102,14 +104,14 @@ export class ExcelToJsonConvert {
             temp[name][actor][land] = {};
           }
 
-          lengths.forEach((length) => {
-            temp[name][actor][land][length] = {};
-          });
+          // lengths.forEach((length) => {
+          //   temp[name][actor][land][length] = '';
+          // });
         });
       });
     });
 
-    for (let i = 2; i < data.length; i++) {
+    for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const name = row[0];
       const actor = row[2];

@@ -102,7 +102,7 @@ export class JsonToExcelConvert {
             },
           };
 
-          if (row === 1) {
+          if (row === 0) {
             cell.s.font = {
               name: 'Arial',
               sz: 10,
@@ -150,7 +150,7 @@ export class JsonToExcelConvert {
     const lands = new Set();
     const secondRow = [null, 'label', null, null];
     let label = null;
-    const firstRow = [null, null, null, null];
+    // const firstRow = [null, null, null, null];
     const formats = new Set();
 
     sortedKeys.forEach((name) => {
@@ -173,56 +173,56 @@ export class JsonToExcelConvert {
     lands.forEach((land) => {
       secondRow.push(land);
 
-      switch (land) {
-        case 'uk':
-          firstRow.push('Оригінал');
-          break;
-        case 'en':
-          firstRow.push('Англійська en');
-          break;
-        case 'pl':
-          firstRow.push('Польська pl');
-          break;
-        case 'lt':
-          firstRow.push('Литовська lt');
-          break;
-        case 'cs':
-          firstRow.push('Чеська cs');
-          break;
-        case 'de':
-          firstRow.push('Німецька de');
-          break;
-        case 'ro':
-          firstRow.push('Румунська ro');
-          break;
-        case 'sk':
-          firstRow.push('Словацька sk');
-          break;
-        case 'lv':
-          firstRow.push('Латиська lv');
-          break;
-        case 'et':
-          firstRow.push('Естонська et');
-          break;
-        case 'hu':
-          firstRow.push('Угорська hu');
-          break;
-        case 'it':
-          firstRow.push('Італійська it');
-          break;
-        case 'fr':
-          firstRow.push('Французська fr');
-          break;
-        case 'es':
-          firstRow.push('Іспанська es');
-          break;
-        case 'ca':
-          firstRow.push('Каталонська са');
-          break;
-      }
+      // switch (land) {
+      //   case 'uk':
+      //     firstRow.push('Оригінал');
+      //     break;
+      //   case 'en':
+      //     firstRow.push('Англійська en');
+      //     break;
+      //   case 'pl':
+      //     firstRow.push('Польська pl');
+      //     break;
+      //   case 'lt':
+      //     firstRow.push('Литовська lt');
+      //     break;
+      //   case 'cs':
+      //     firstRow.push('Чеська cs');
+      //     break;
+      //   case 'de':
+      //     firstRow.push('Німецька de');
+      //     break;
+      //   case 'ro':
+      //     firstRow.push('Румунська ro');
+      //     break;
+      //   case 'sk':
+      //     firstRow.push('Словацька sk');
+      //     break;
+      //   case 'lv':
+      //     firstRow.push('Латиська lv');
+      //     break;
+      //   case 'et':
+      //     firstRow.push('Естонська et');
+      //     break;
+      //   case 'hu':
+      //     firstRow.push('Угорська hu');
+      //     break;
+      //   case 'it':
+      //     firstRow.push('Італійська it');
+      //     break;
+      //   case 'fr':
+      //     firstRow.push('Французська fr');
+      //     break;
+      //   case 'es':
+      //     firstRow.push('Іспанська es');
+      //     break;
+      //   case 'ca':
+      //     firstRow.push('Каталонська са');
+      //     break;
+      // }
     });
 
-    excelData.push(firstRow);
+    // excelData.push(firstRow);
     excelData.push(secondRow);
 
     names.forEach((name) => {
