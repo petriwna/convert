@@ -15,12 +15,12 @@ export class ExcelToJsonConvert {
     this.dragElement.addEventListener('dragover', (event) => {
       event.preventDefault();
       this.dragElement.classList.add('active');
-      this.dropText.textContent = 'Release to Upload';
+      this.dropText.value = 'Release to Upload';
     });
 
     this.dragElement.addEventListener('dragleave', () => {
       this.dragElement.classList.remove('active');
-      this.dropText.textContent = 'Drag & Drop';
+      this.dropText.value = 'Drag & Drop';
     });
 
     this.dragElement.addEventListener('drop', (event) => {

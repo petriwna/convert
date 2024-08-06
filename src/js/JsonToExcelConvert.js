@@ -1,11 +1,11 @@
 import * as XLSX from 'xlsx-js-style';
 
 export class JsonToExcelConvert {
-  constructor(fileInputId, dragId, btnId, dropTextId) {
+  constructor(fileInputId, dragId, dropTextId) {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
     this.dragElement = document.getElementById(dragId);
-    this.button = document.getElementById(btnId);
+    // this.button = document.getElementById(btnId);
     this.dropText = document.getElementById(dropTextId);
     // this.convertButton = document.getElementById(convertButtonId);
 
@@ -13,17 +13,17 @@ export class JsonToExcelConvert {
   }
 
   init() {
-    this.button.addEventListener('click', () => this.fileInput.click());
+    // this.button.addEventListener('click', () => this.fileInput.click());
     this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
     this.dragElement.addEventListener('dragover', (event) => {
       event.preventDefault();
       this.dragElement.classList.add('active');
-      this.dropText.textContent = 'Release to Upload';
+      this.dropText.value = 'Release to Upload';
     });
 
     this.dragElement.addEventListener('dragleave', () => {
       this.dragElement.classList.remove('active');
-      this.dropText.textContent = 'Drag & Drop';
+      this.dropText.value = 'Drag & Drop';
     });
 
     this.dragElement.addEventListener('drop', (event) => {
@@ -73,7 +73,7 @@ export class JsonToExcelConvert {
       };
       fileReader.readAsText(this.selectedFile);
       this.dragElement.classList.remove('active');
-      this.dropText.textContent = 'Drag & Drop';
+      this.dropText.value = 'Drag & Drop';
     } catch (error) {
       console.error('Error reading JSON file:', error);
     }
@@ -162,7 +162,6 @@ export class JsonToExcelConvert {
 
           for (const land in jsonData[name][actor]) {
             lands.add(land);
-
             for (const format in jsonData[name][actor][land]) {
               formats.add(format);
             }
@@ -175,7 +174,7 @@ export class JsonToExcelConvert {
       secondRow.push(land);
 
       switch (land) {
-        case 'ua':
+        case 'uk':
           firstRow.push('Оригінал');
           break;
         case 'en':
@@ -187,8 +186,8 @@ export class JsonToExcelConvert {
         case 'lt':
           firstRow.push('Литовська lt');
           break;
-        case 'cz':
-          firstRow.push('Чеська cz');
+        case 'cs':
+          firstRow.push('Чеська cs');
           break;
         case 'de':
           firstRow.push('Німецька de');
