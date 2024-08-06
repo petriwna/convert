@@ -1,29 +1,61 @@
 import * as XLSX from 'xlsx-js-style';
 
 export class JsonToExcelConvert {
-  constructor(fileInputId, convertButtonId) {
+  constructor(fileInputId, dragId, btnId, dropTextId) {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
-    this.convertButton = document.getElementById(convertButtonId);
+    this.dragElement = document.getElementById(dragId);
+    this.button = document.getElementById(btnId);
+    this.dropText = document.getElementById(dropTextId);
+    // this.convertButton = document.getElementById(convertButtonId);
 
     this.init();
   }
 
   init() {
+    this.button.addEventListener('click', () => this.fileInput.click());
     this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
-    this.convertButton.addEventListener('click', () => this.handleConvertFile());
+    this.dragElement.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      this.dragElement.classList.add('active');
+      this.dropText.textContent = 'Release to Upload';
+    });
+
+    this.dragElement.addEventListener('dragleave', () => {
+      this.dragElement.classList.remove('active');
+      this.dropText.textContent = 'Drag & Drop';
+    });
+
+    this.dragElement.addEventListener('drop', (event) => {
+      event.preventDefault();
+      this.selectedFile = event.dataTransfer.files[0];
+      this.displayFile();
+    });
+  }
+
+  displayFile() {
+    const fileType = this.selectedFile.type;
+    const validMimeType = 'application/json';
+    const validExtension = '.json';
+
+    if (fileType === validMimeType && this.selectedFile.name.endsWith(validExtension)) {
+      this.handleConvertFile();
+    } else {
+      alert('This is not a JSON file.');
+      this.dragElement.classList.remove('active');
+    }
   }
 
   handleFileSelect(event) {
     if (event.target.files && event.target.files.length > 0) {
       this.selectedFile = event.target.files[0];
+      this.displayFile();
     } else {
       console.error('No file selected');
     }
   }
 
   handleConvertFile() {
-    console.log('convert');
     try {
       const fileReader = new FileReader();
       fileReader.onload = (event) => {
@@ -40,29 +72,12 @@ export class JsonToExcelConvert {
         XLSX.writeFile(wb, filename);
       };
       fileReader.readAsText(this.selectedFile);
+      this.dragElement.classList.remove('active');
+      this.dropText.textContent = 'Drag & Drop';
     } catch (error) {
       console.error('Error reading JSON file:', error);
     }
   }
-
-  // downloadObjectAsExcel(jsonData, filename) {
-  //   try {
-  //     const formattedData = this.jsonToExcelFormat(jsonData);
-  //     if (formattedData.length === 0) {
-  //       throw new Error('Formatted data is empty. Please check the JSON structure.');
-  //     }
-  //     const ws = XLSX.utils.aoa_to_sheet(formattedData);
-  //
-  //     this.applyStyles(ws);
-  //
-  //     const wb = XLSX.utils.book_new();
-  //
-  //     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  //     XLSX.writeFile(wb, `${filename}.xlsx`);
-  //   } catch (error) {
-  //     console.error('Error during Excel file creation:', error);
-  //   }
-  // }
 
   applyStyles(ws) {
     const range = XLSX.utils.decode_range(ws['!ref']);
@@ -230,7 +245,6 @@ export class JsonToExcelConvert {
       });
     });
 
-    console.log(names)
     return excelData;
   }
 }

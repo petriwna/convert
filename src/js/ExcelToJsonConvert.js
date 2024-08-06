@@ -1,8 +1,8 @@
 export class ExcelToJsonConvert {
-  constructor(fileInputId, convertButtonId, outputId, downloadButtonId) {
+  constructor(fileInputId, outputId, downloadButtonId) {
     this.selectedFile = null;
     this.fileInput = document.getElementById(fileInputId);
-    this.convertButton = document.getElementById(convertButtonId);
+    // this.convertButton = document.getElementById(convertButtonId);
     this.outputElement = document.getElementById(outputId);
     this.downloadButton = document.getElementById(downloadButtonId);
 
@@ -11,13 +11,14 @@ export class ExcelToJsonConvert {
 
   init() {
     this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
-    this.convertButton.addEventListener('click', () => this.handleConvertFile());
+    // this.convertButton.addEventListener('click', () => this.handleConvertFile());
     this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
   }
 
-  handleFileSelect(event) {
+  async handleFileSelect(event) {
     if (event.target.files && event.target.files.length > 0) {
       this.selectedFile = event.target.files[0];
+      await this.handleConvertFile();
     } else {
       console.error('No file selected');
     }
