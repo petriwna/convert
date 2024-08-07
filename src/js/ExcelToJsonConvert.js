@@ -16,7 +16,22 @@ export class ExcelToJsonConvert extends FileHandler {
   }
 
   async displayFile() {
-    await this.handleConvertFile();
+    const fileType = this.selectedFile.type;
+    const validExcelMimeTypes = [
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ];
+    const validExcelExtensions = ['.xls', '.xlsx'];
+
+    if (
+      validExcelMimeTypes.includes(fileType) &&
+      validExcelExtensions.some((ext) => this.selectedFile.name.endsWith(ext))
+    ) {
+      await this.handleConvertFile();
+    } else {
+      alert('This is not a Excel file.');
+      removeClassFromElement(this.dragElement, 'active');
+    }
   }
 
   async handleConvertFile() {
