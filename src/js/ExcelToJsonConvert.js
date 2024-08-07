@@ -1,65 +1,28 @@
-export class ExcelToJsonConvert {
+import { FileHandler } from './FileHandler';
+import { getNodeValue, removeClassFromElement, setNodeTextContent, setNodeValue } from './utils';
+
+export class ExcelToJsonConvert extends FileHandler {
   constructor(fileInputId, outputId, downloadButtonId, dragId, dropTextId) {
-    this.selectedFile = null;
-    this.fileInput = document.getElementById(fileInputId);
+    super(fileInputId, dragId, dropTextId);
+
     this.outputElement = document.getElementById(outputId);
-    this.dragElement = document.getElementById(dragId);
-    this.dropText = document.getElementById(dropTextId);
     this.downloadButton = document.getElementById(downloadButtonId);
 
-    this.init();
+    this.initDownloadButton();
   }
 
-  init() {
-    this.fileInput.addEventListener('change', (event) =>
-      this.handleFileSelect(event.target.files[0]),
-    );
-    this.dragElement.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      this.dragElement.classList.add('active');
-      this.dropText.value = 'Release to Upload';
-    });
-
-    this.dragElement.addEventListener('dragleave', () => {
-      this.dragElement.classList.remove('active');
-      this.dropText.value = 'Drag & Drop';
-    });
-
-    this.dragElement.addEventListener('drop', (event) => {
-      event.preventDefault();
-      // this.selectedFile = event.dataTransfer.files[0];
-      this.handleFileSelect(event.dataTransfer.files[0]);
-    });
+  initDownloadButton() {
     this.downloadButton.addEventListener('click', () => this.handleDownloadFile());
   }
 
-  displayFile() {
-    const fileType = this.selectedFile.type;
-    const validMimeType = 'application/json';
-    const validExtension = '.xls';
-
-    if (fileType === validMimeType && this.selectedFile.name.endsWith(validExtension)) {
-      this.handleConvertFile();
-    } else {
-      alert('This is not a JSON file.');
-      this.dragElement.classList.remove('active');
-    }
-  }
-
-  async handleFileSelect(file) {
-    if (file) {
-      this.selectedFile = file;
-      await this.handleConvertFile();
-    } else {
-      console.error('No file selected');
-    }
+  async displayFile() {
+    await this.handleConvertFile();
   }
 
   async handleConvertFile() {
     try {
       const data = await readXlsxFile(this.selectedFile);
-      const jsonData = this.convertToJson(data);
-      this.displayJson(jsonData);
+      this.displayJson(this.convertToJson(data));
     } catch (error) {
       console.error('Error reading file:', error);
     }
@@ -89,11 +52,28 @@ export class ExcelToJsonConvert {
       }
     });
 
+    names.sort((a, b) => {
+      const [numA, suffixA] = a.split('_');
+      const [numB, suffixB] = b.split('_');
+      const intA = parseInt(numA, 10);
+      const intB = parseInt(numB, 10);
+
+      if (intA !== intB) {
+        return intA - intB;
+      } else if (suffixA && suffixB) {
+        return suffixA.localeCompare(suffixB);
+      } else if (suffixA) {
+        return 1;
+      } else if (suffixB) {
+        return -1;
+      }
+      return 0;
+    });
+
     names.forEach((name) => {
       if (!temp[name]) {
         temp[name] = {};
       }
-
       actors.forEach((actor) => {
         if (!temp[name][actor]) {
           temp[name][actor] = {};
@@ -103,10 +83,6 @@ export class ExcelToJsonConvert {
           if (!temp[name][actor][land]) {
             temp[name][actor][land] = {};
           }
-
-          // lengths.forEach((length) => {
-          //   temp[name][actor][land][length] = '';
-          // });
         });
       });
     });
@@ -130,24 +106,30 @@ export class ExcelToJsonConvert {
   }
 
   displayJson(jsonData) {
-    this.outputElement.value = JSON.stringify(jsonData, null, 2);
+    setNodeValue(this.outputElement, JSON.stringify(jsonData, null, 2));
   }
 
   handleDownloadFile() {
-    const jsonData = this.outputElement.value;
+    const jsonData = getNodeValue(this.outputElement);
+
     this.downloadObjectAsJson(jsonData, 'excel_to_json');
-    this.dragElement.classList.remove('active');
-    this.dropText.textContent = 'Drag & Drop';
-    this.outputElement.value = '';
+
+    removeClassFromElement(this.dragElement, 'active');
+    setNodeTextContent(this.dropText, 'Drag & Drop');
+    setNodeValue(this.outputElement, '');
+
     this.selectedFile = null;
   }
 
   downloadObjectAsJson(jsonData, filename) {
     const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
     const downloadAnchorNode = document.createElement('a');
+
     downloadAnchorNode.setAttribute('href', dataStr);
     downloadAnchorNode.setAttribute('download', `${filename}.json`);
+
     document.body.appendChild(downloadAnchorNode);
+
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
   }

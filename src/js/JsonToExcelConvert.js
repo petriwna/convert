@@ -1,36 +1,11 @@
 import * as XLSX from 'xlsx-js-style';
 
-export class JsonToExcelConvert {
+import { FileHandler } from './FileHandler';
+import { removeClassFromElement, setNodeTextContent } from './utils';
+
+export class JsonToExcelConvert extends FileHandler {
   constructor(fileInputId, dragId, dropTextId) {
-    this.selectedFile = null;
-    this.fileInput = document.getElementById(fileInputId);
-    this.dragElement = document.getElementById(dragId);
-    // this.button = document.getElementById(btnId);
-    this.dropText = document.getElementById(dropTextId);
-    // this.convertButton = document.getElementById(convertButtonId);
-
-    this.init();
-  }
-
-  init() {
-    // this.button.addEventListener('click', () => this.fileInput.click());
-    this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
-    this.dragElement.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      this.dragElement.classList.add('active');
-      this.dropText.value = 'Release to Upload';
-    });
-
-    this.dragElement.addEventListener('dragleave', () => {
-      this.dragElement.classList.remove('active');
-      this.dropText.value = 'Drag & Drop';
-    });
-
-    this.dragElement.addEventListener('drop', (event) => {
-      event.preventDefault();
-      this.selectedFile = event.dataTransfer.files[0];
-      this.displayFile();
-    });
+    super(fileInputId, dragId, dropTextId);
   }
 
   displayFile() {
@@ -42,16 +17,7 @@ export class JsonToExcelConvert {
       this.handleConvertFile();
     } else {
       alert('This is not a JSON file.');
-      this.dragElement.classList.remove('active');
-    }
-  }
-
-  handleFileSelect(event) {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-      this.displayFile();
-    } else {
-      console.error('No file selected');
+      removeClassFromElement(this.dragElement, 'active');
     }
   }
 
@@ -72,8 +38,9 @@ export class JsonToExcelConvert {
         XLSX.writeFile(wb, filename);
       };
       fileReader.readAsText(this.selectedFile);
-      this.dragElement.classList.remove('active');
-      this.dropText.value = 'Drag & Drop';
+
+      removeClassFromElement(this.dragElement, 'active');
+      setNodeTextContent(this.dropText, 'Drag & Drop');
     } catch (error) {
       console.error('Error reading JSON file:', error);
     }
@@ -136,11 +103,13 @@ export class JsonToExcelConvert {
     const sortedKeys = Object.keys(jsonData).sort((a, b) => {
       const numA = parseInt(a.split('_')[0], 10);
       const numB = parseInt(b.split('_')[0], 10);
+
       if (numA !== numB) {
         return numA - numB;
       }
       const suffixA = a.split('_').slice(1).join('_');
       const suffixB = b.split('_').slice(1).join('_');
+
       return suffixA.localeCompare(suffixB);
     });
 
@@ -150,7 +119,6 @@ export class JsonToExcelConvert {
     const lands = new Set();
     const secondRow = [null, 'label', null, null];
     let label = null;
-    // const firstRow = [null, null, null, null];
     const formats = new Set();
 
     sortedKeys.forEach((name) => {
@@ -172,57 +140,8 @@ export class JsonToExcelConvert {
 
     lands.forEach((land) => {
       secondRow.push(land);
-
-      // switch (land) {
-      //   case 'uk':
-      //     firstRow.push('Оригінал');
-      //     break;
-      //   case 'en':
-      //     firstRow.push('Англійська en');
-      //     break;
-      //   case 'pl':
-      //     firstRow.push('Польська pl');
-      //     break;
-      //   case 'lt':
-      //     firstRow.push('Литовська lt');
-      //     break;
-      //   case 'cs':
-      //     firstRow.push('Чеська cs');
-      //     break;
-      //   case 'de':
-      //     firstRow.push('Німецька de');
-      //     break;
-      //   case 'ro':
-      //     firstRow.push('Румунська ro');
-      //     break;
-      //   case 'sk':
-      //     firstRow.push('Словацька sk');
-      //     break;
-      //   case 'lv':
-      //     firstRow.push('Латиська lv');
-      //     break;
-      //   case 'et':
-      //     firstRow.push('Естонська et');
-      //     break;
-      //   case 'hu':
-      //     firstRow.push('Угорська hu');
-      //     break;
-      //   case 'it':
-      //     firstRow.push('Італійська it');
-      //     break;
-      //   case 'fr':
-      //     firstRow.push('Французська fr');
-      //     break;
-      //   case 'es':
-      //     firstRow.push('Іспанська es');
-      //     break;
-      //   case 'ca':
-      //     firstRow.push('Каталонська са');
-      //     break;
-      // }
     });
 
-    // excelData.push(firstRow);
     excelData.push(secondRow);
 
     names.forEach((name) => {
