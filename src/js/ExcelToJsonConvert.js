@@ -129,9 +129,7 @@ export class ExcelToJsonConvert extends FileHandler {
 
     this.downloadObjectAsJson(jsonData, 'excel_to_json');
 
-    removeClassFromElement(this.dragElement, 'active');
-    setNodeTextContent(this.dropText, 'Drag & Drop');
-    setNodeValue(this.outputElement, '');
+    this.resetUI();
 
     this.selectedFile = null;
   }
@@ -147,5 +145,12 @@ export class ExcelToJsonConvert extends FileHandler {
 
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
+  }
+
+  resetUI() {
+    removeClassFromElement(this.dragElement, 'active');
+    setNodeTextContent(this.dropText, 'Drag & Drop');
+    setNodeValue(this.outputElement, '');
+    this.selectedFile = null;
   }
 }

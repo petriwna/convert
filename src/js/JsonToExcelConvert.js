@@ -9,11 +9,7 @@ export class JsonToExcelConvert extends FileHandler {
   }
 
   displayFile() {
-    const fileType = this.selectedFile.type;
-    const validMimeType = 'application/json';
-    const validExtension = '.json';
-
-    if (fileType === validMimeType && this.selectedFile.name.endsWith(validExtension)) {
+    if (this.isJsonFile()) {
       this.handleConvertFile();
     } else {
       alert('This is not a JSON file.');
@@ -21,29 +17,116 @@ export class JsonToExcelConvert extends FileHandler {
     }
   }
 
+  isJsonFile() {
+    const fileType = this.selectedFile.type;
+    const validMimeType = 'application/json';
+    const validExtension = '.json';
+
+    return fileType === validMimeType && this.selectedFile.name.endsWith(validExtension);
+  }
+
   handleConvertFile() {
-    try {
-      const fileReader = new FileReader();
-      fileReader.onload = (event) => {
+    const fileReader = new FileReader();
+
+    fileReader.onload = (event) => {
+      try {
         const jsonData = JSON.parse(event.target.result);
-        const formattedData = this.jsonToExcelFormat(jsonData);
-        const ws = XLSX.utils.aoa_to_sheet(formattedData);
+        const formattedData = this.convertJsonToExcelFormat(jsonData);
 
-        this.applyStyles(ws);
+        this.downloadExcel(formattedData);
+      } catch (error) {
+        console.error('Error reading JSON file:', error);
+      }
+    };
+    fileReader.readAsText(this.selectedFile);
+  }
 
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  convertJsonToExcelFormat(jsonData) {
+    const sortedKeys = this.sortKeys(Object.keys(jsonData));
+    const [names, actors, lands, formats] = this.extractUniqueValues(jsonData, sortedKeys);
 
-        const filename = 'json_to_excel.xlsx';
-        XLSX.writeFile(wb, filename);
-      };
-      fileReader.readAsText(this.selectedFile);
+    const excelData = this.createExcelData(names, actors, lands, formats, jsonData);
 
-      removeClassFromElement(this.dragElement, 'active');
-      setNodeTextContent(this.dropText, 'Drag & Drop');
-    } catch (error) {
-      console.error('Error reading JSON file:', error);
-    }
+    return excelData;
+  }
+
+  sortKeys(keys) {
+    return keys.sort((a, b) => {
+      const [numA, suffixA] = this.splitKey(a);
+      const [numB, suffixB] = this.splitKey(b);
+
+      return numA - numB || suffixA.localeCompare(suffixB);
+    });
+  }
+
+  splitKey(key) {
+    const [num, ...suffixParts] = key.split('_');
+    return [parseInt(num, 10), suffixParts.join('_')];
+  }
+
+  extractUniqueValues(jsonData, sortedKeys) {
+    const names = [];
+    const actors = new Set();
+    const lands = new Set();
+    const formats = new Set();
+
+    sortedKeys.forEach((name) => {
+      names.push(name);
+
+      const entry = jsonData[name];
+
+      for (const actor in entry) {
+        if (actor !== 'label') {
+          actors.add(actor);
+
+          for (const land in entry[actor]) {
+            lands.add(land);
+            for (const format in entry[actor][land]) {
+              formats.add(format);
+            }
+          }
+        }
+      }
+    });
+
+    return [names, actors, lands, formats];
+  }
+
+  createExcelData(names, actors, lands, formats, jsonData) {
+    const excelData = [this.createHeaderRow(lands)];
+
+    names.forEach((name) => {
+      actors.forEach((actor) => {
+        if (actor !== 'label') {
+          formats.forEach((format) => {
+            const row = [name, jsonData[name].label, actor, format];
+
+            lands.forEach((land) => {
+              row.push(jsonData[name][actor][land][format] || '');
+            });
+
+            excelData.push(row);
+          });
+        }
+      });
+    });
+
+    return excelData;
+  }
+
+  createHeaderRow(lands) {
+    return [null, 'label', null, null, ...lands];
+  }
+
+  downloadExcel(formattedData) {
+    const ws = XLSX.utils.aoa_to_sheet(formattedData);
+    this.applyStyles(ws);
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, 'json_to_excel.xlsx');
+
+    this.resetUI();
   }
 
   applyStyles(ws) {
@@ -55,114 +138,53 @@ export class JsonToExcelConvert extends FileHandler {
         const cell = ws[cellAddress];
 
         if (cell) {
-          cell.s = {
-            font: {
-              name: 'Arial',
-              sz: 10,
-            },
-            alignment: { wrapText: true },
-            border: {
-              top: { style: 'thin' },
-              bottom: { style: 'thin' },
-              left: { style: 'thin' },
-              right: { style: 'thin' },
-            },
-          };
-
-          if (row === 0) {
-            cell.s.font = {
-              name: 'Arial',
-              sz: 10,
-              bold: true,
-            };
-            cell.s.fill = { fgColor: { rgb: 'c5d9f1' } };
-            cell.s.alignment = { horizontal: 'center' };
-          }
-
-          if (col >= 0 && col <= 3) {
-            cell.s.fill = { fgColor: { rgb: 'c5d9f1' } };
-            cell.s.font = {
-              name: 'Arial',
-              sz: 10,
-              bold: true,
-            };
-          }
-
-          if (col >= 4 && row >= 2) {
-            cell.s.font = {
-              name: 'Arial',
-              sz: 8,
-            };
-          }
+          this.styleCell(cell, row, col);
         }
       }
     }
   }
 
-  jsonToExcelFormat(jsonData) {
-    const sortedKeys = Object.keys(jsonData).sort((a, b) => {
-      const numA = parseInt(a.split('_')[0], 10);
-      const numB = parseInt(b.split('_')[0], 10);
+  styleCell(cell, row, col) {
+    cell.s = {
+      font: {
+        name: 'Arial',
+        sz: 10,
+      },
+      alignment: { wrapText: true },
+      border: {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+      },
+    };
 
-      if (numA !== numB) {
-        return numA - numB;
-      }
-      const suffixA = a.split('_').slice(1).join('_');
-      const suffixB = b.split('_').slice(1).join('_');
+    if (row === 0) {
+      cell.s.font = {
+        name: 'Arial',
+        sz: 10,
+        bold: true,
+      };
+      cell.s.fill = { fgColor: { rgb: 'c5d9f1' } };
+      cell.s.alignment = { horizontal: 'center' };
+    }
 
-      return suffixA.localeCompare(suffixB);
-    });
+    if (col <= 3) {
+      cell.s.fill = { fgColor: { rgb: 'c5d9f1' } };
+      cell.s.font = {
+        sz: 10,
+        bold: true,
+      };
+    }
 
-    const excelData = [];
-    const names = [];
-    const actors = new Set();
-    const lands = new Set();
-    const secondRow = [null, 'label', null, null];
-    let label = null;
-    const formats = new Set();
+    if (col >= 4 && row >= 2) {
+      cell.s.font.sz = 8;
+    }
+  }
 
-    sortedKeys.forEach((name) => {
-      names.push(name);
-
-      for (const actor in jsonData[name]) {
-        if (actor !== 'label') {
-          actors.add(actor);
-
-          for (const land in jsonData[name][actor]) {
-            lands.add(land);
-            for (const format in jsonData[name][actor][land]) {
-              formats.add(format);
-            }
-          }
-        }
-      }
-    });
-
-    lands.forEach((land) => {
-      secondRow.push(land);
-    });
-
-    excelData.push(secondRow);
-
-    names.forEach((name) => {
-      actors.forEach((actor) => {
-        if (actor !== 'label') {
-          formats.forEach((format) => {
-            label = jsonData[name].label;
-
-            const row = [name, label, actor, format];
-
-            lands.forEach((land) => {
-              const text = jsonData[name][actor][land][format] || '';
-              row.push(text);
-            });
-
-            excelData.push(row);
-          });
-        }
-      });
-    });
-
-    return excelData;
+  resetUI() {
+    removeClassFromElement(this.dragElement, 'active');
+    setNodeTextContent(this.dropText, 'Drag & Drop');
+    this.selectedFile = null;
   }
 }
