@@ -36,6 +36,8 @@ export class JsonToExcelConvert extends FileHandler {
         this.downloadExcel(formattedData);
       } catch (error) {
         console.error('Error reading JSON file:', error);
+        alert('Error reading file');
+        this.resetUI();
       }
     };
     fileReader.readAsText(this.selectedFile);
@@ -45,9 +47,7 @@ export class JsonToExcelConvert extends FileHandler {
     const sortedKeys = this.sortKeys(Object.keys(jsonData));
     const [names, actors, lands, formats] = this.extractUniqueValues(jsonData, sortedKeys);
 
-    const excelData = this.createExcelData(names, actors, lands, formats, jsonData);
-
-    return excelData;
+    return this.createExcelData(names, actors, lands, formats, jsonData);
   }
 
   sortKeys(keys) {
