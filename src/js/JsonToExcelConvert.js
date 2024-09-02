@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx-js-style';
 
 import { FileHandler } from './FileHandler';
-import { removeClassFromElement, setNodeTextContent } from './utils';
+import { removeClassFromElement, setElementTextContent } from './utils';
 
 export class JsonToExcelConvert extends FileHandler {
   constructor(fileInputId, dragId, dropTextId) {
@@ -184,7 +184,7 @@ export class JsonToExcelConvert extends FileHandler {
 
   resetUI() {
     removeClassFromElement(this.dragElement, 'active');
-    setNodeTextContent(this.dropText, 'Drag & Drop');
+    setElementTextContent(this.dropText, 'Drag & Drop');
     this.selectedFile = null;
   }
 }

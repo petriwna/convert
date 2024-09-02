@@ -1,4 +1,4 @@
-import { addClassToElement, removeClassFromElement, setNodeTextContent } from './utils';
+import { addClassToElement, removeClassFromElement, setElementTextContent } from './utils';
 
 export class FileHandler {
   constructor(fileInputId, dragId, dropTextId) {
@@ -21,7 +21,7 @@ export class FileHandler {
     if (event.target.files && event.target.files.length > 0) {
       this.selectedFile = event.target.files[0];
       addClassToElement(this.dragElement, 'active');
-      setNodeTextContent(this.dropText, 'Release to Upload');
+      setElementTextContent(this.dropText, 'Release to Upload');
       this.displayFile();
     } else {
       console.error('No file selected');
@@ -31,12 +31,12 @@ export class FileHandler {
   handleDragOver(event) {
     event.preventDefault();
     addClassToElement(this.dragElement, 'active');
-    setNodeTextContent(this.dropText, 'Release to Upload');
+    setElementTextContent(this.dropText, 'Release to Upload');
   }
 
   handleDragLeave() {
     removeClassFromElement(this.dragElement, 'active');
-    setNodeTextContent(this.dropText, 'Drag & Drop');
+    setElementTextContent(this.dropText, 'Drag & Drop');
   }
 
   handleDrop(event) {

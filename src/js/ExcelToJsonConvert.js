@@ -1,5 +1,10 @@
 import { FileHandler } from './FileHandler';
-import { getNodeValue, removeClassFromElement, setNodeTextContent, setNodeValue } from './utils';
+import {
+  getElementValue,
+  removeClassFromElement,
+  setElementTextContent,
+  setElementValue,
+} from './utils';
 
 export class ExcelToJsonConvert extends FileHandler {
   constructor(fileInputId, outputId, downloadButtonId, dragId, dropTextId) {
@@ -87,11 +92,11 @@ export class ExcelToJsonConvert extends FileHandler {
   }
 
   displayJson(jsonData) {
-    setNodeValue(this.outputElement, JSON.stringify(jsonData, null, 2));
+    setElementValue(this.outputElement, JSON.stringify(jsonData, null, 2));
   }
 
   handleDownloadFile() {
-    const jsonData = getNodeValue(this.outputElement);
+    const jsonData = getElementValue(this.outputElement);
 
     this.downloadJson(jsonData, 'excel_to_json');
     this.resetUI();
@@ -112,8 +117,8 @@ export class ExcelToJsonConvert extends FileHandler {
 
   resetUI() {
     removeClassFromElement(this.dragElement, 'active');
-    setNodeTextContent(this.dropText, 'Drag & Drop');
-    setNodeValue(this.outputElement, '');
+    setElementTextContent(this.dropText, 'Drag & Drop');
+    setElementValue(this.outputElement, '');
     this.selectedFile = null;
   }
 }
