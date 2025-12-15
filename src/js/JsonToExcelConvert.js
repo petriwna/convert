@@ -102,7 +102,7 @@ export class JsonToExcelConvert extends FileHandler {
             const row = [name, jsonData[name].label, actor, format];
 
             lands.forEach((land) => {
-              row.push(jsonData[name][actor][land][format] || '');
+              row.push(jsonData[name]?.[actor]?.[land]?.[format] || '');
             });
 
             excelData.push(row);
